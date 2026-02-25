@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.npm
+.next/
+out/
+build/
+
+# Environment
+.env
+.env.*
+*.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docs
+*.md
+!README.md
+
+# Config
+railway.toml
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.tox/
+pytest/
