@@ -1,3 +1,11 @@
+---
+title: Hackathon Todo Backend
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+---
 # Hackathon TODO - Phase I: Console App
 
 Task management CLI application built with Python using clean architecture and spec-driven development.
