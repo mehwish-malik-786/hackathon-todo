@@ -1,3 +1,11 @@
+---
+title: Hackathon Todo Backend
+emoji: 🚀
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+---
 # Use Python 3.12 slim image
 FROM python:3.12-slim
 
