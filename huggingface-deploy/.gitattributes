@@ -1,0 +1,18 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python files
+*.py text
+*.txt text
+*.md text
+*.toml text
+*.env text
+
+# Docker files
+Dockerfile* text
+.dockerignore text
+
+# Explicitly declare files as text
+.gitattributes text
+.gitignore text
+requirements.txt text
