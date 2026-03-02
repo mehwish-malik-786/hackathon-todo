@@ -31,3 +31,7 @@
      31 upload_to_hf_v2.py
      32 upload_to_hf_v3.py
 
+.env
+upload_to_hf.py
+upload_to_hf_v2.py
+upload_to_hf_v3.py
