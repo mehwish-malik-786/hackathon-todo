@@ -1,51 +1,33 @@
-# Environment files with secrets
-.env
-.env.*
-*.env
+ 1 # Python
+      2 __pycache__/
+      3 *.py[cod]
+      4 *.pyo
+      5 *.pyd
+      6 .Python
+      7 venv/
+      8 env/
+      9 .venv/
+     10 
+     11 # Environment
+     12 .env
+     13 
+     14 # IDE
+     15 .vscode/
+     16 .idea/
+     17 *.swp
+     18 *.swo
+     19 
+     20 # OS
+     21 .DS_Store
+     22 Thumbs.db
+     23 
+     24 # Coverage
+     25 .coverage
+     26 htmlcov/
+     27 .tox/
+     28 
+     29 # HuggingFace Upload Scripts (contain secrets)
+     30 upload_to_hf.py
+     31 upload_to_hf_v2.py
+     32 upload_to_hf_v3.py
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-env/
-ENV/
-.venv
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Coverage
-.coverage
-htmlcov/
-.tox/
