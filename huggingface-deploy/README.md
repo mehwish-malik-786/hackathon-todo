@@ -1,46 +1,25 @@
-# Hugging Face Space for Hackathon TODO API
+---
+title: hackathon-todo-backend
+emoji: 🚀
+colorFrom: blue
+colorTo: purple
+sdk: docker
+sdk_version: "latest"
+app_file: Dockerfile
+pinned: false
+---
 
-A full-stack task management application built with FastAPI and Next.js.
+# Hackathon TODO Backend
 
-## 🚀 Features
+FastAPI backend with AI Chatbot support.
 
-- Create, Read, Update, Delete tasks
-- Mark tasks as complete
-- Search and filter tasks
-- Responsive UI with Bootstrap
-- PostgreSQL database (Neon)
+## Features
+- Task CRUD operations
+- AI Chatbot (Phase III)
+- PostgreSQL database
 
-## 🛠️ Tech Stack
-
-- **Backend:** FastAPI, SQLModel, PostgreSQL
-- **Frontend:** Next.js, React, TypeScript, Bootstrap
-- **Database:** Neon PostgreSQL
-
-## 📦 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/tasks` | List all tasks |
-| POST | `/tasks` | Create task |
-| GET | `/tasks/{id}` | Get task by ID |
-| PUT | `/tasks/{id}` | Update task |
-| DELETE | `/tasks/{id}` | Delete task |
-| PATCH | `/tasks/{id}/complete` | Mark complete |
-
-## 🧪 Test Locally
-
-```bash
-# Backend
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 7860
-
-# Frontend
-cd frontend
-npm install
-npm run dev
-```
-
-## 📄 License
-
-MIT
+## API Endpoints
+- `/` - Root endpoint
+- `/health` - Health check
+- `/tasks` - Task operations
+- `/api/chat` - AI Chat
