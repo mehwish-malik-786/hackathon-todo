@@ -27,7 +27,7 @@ class MessageRepository:
             conversation_id=conversation_id,
             role=role,
             content=content,
-            msg_metadata=metadata
+            metadata_=metadata
         )
         self.session.add(message)
         self.session.commit()

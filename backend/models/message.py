@@ -17,7 +17,9 @@ class Message(SQLModel, table=True):
     role: str = Field(..., max_length=20)  # 'user', 'assistant', 'system'
     content: str = Field(..., max_length=4000)
     created_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"default": datetime.utcnow})
-    msg_metadata: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column("msg_metadata", JSON))
+    # Use 'metadata_' to avoid conflict with SQLAlchemy's reserved 'metadata' attribute
+    # Column name in DB remains 'metadata' for backward compatibility
+    metadata_: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column("metadata", JSON))
 
     def to_dict(self) -> dict:
         """Convert message to dictionary representation."""
@@ -27,5 +29,5 @@ class Message(SQLModel, table=True):
             "role": self.role,
             "content": self.content,
             "created_at": self.created_at.isoformat(),
-            "metadata": self.msg_metadata,
+            "metadata": self.metadata_,
         }

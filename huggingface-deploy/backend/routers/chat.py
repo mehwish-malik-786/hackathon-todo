@@ -258,7 +258,7 @@ def get_conversation_history(
                 role=msg.role,
                 content=msg.content,
                 created_at=msg.created_at,
-                metadata=msg.msg_metadata
+                metadata=msg.metadata_
             )
             for msg in messages
         ]
