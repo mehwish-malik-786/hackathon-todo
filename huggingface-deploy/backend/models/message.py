@@ -16,8 +16,8 @@ class Message(SQLModel, table=True):
     conversation_id: int = Field(..., foreign_key="conversations.id", index=True)
     role: str = Field(..., max_length=20)  # 'user', 'assistant', 'system'
     content: str = Field(..., max_length=4000)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    msg_metadata: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column("metadata", JSON))
+    created_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"default": datetime.utcnow})
+    msg_metadata: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column("msg_metadata", JSON))
 
     def to_dict(self) -> dict:
         """Convert message to dictionary representation."""
