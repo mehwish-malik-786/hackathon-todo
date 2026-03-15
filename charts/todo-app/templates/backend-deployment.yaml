@@ -1,0 +1,94 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: backend
+    version: v1
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: todo-app
+  annotations:
+    dapr.io/enabled: {{ .Values.global.daprEnabled | quote }}
+    dapr.io/app-id: "backend"
+    dapr.io/app-port: {{ .Values.backend.env.PORT | quote }}
+    dapr.io/enabled-metrics: {{ .Values.dapr.sidecar.metricsEnabled | quote }}
+    prometheus.io/scrape: {{ .Values.global.monitoring | quote }}
+    prometheus.io/port: "9090"
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v1
+        app.kubernetes.io/name: backend
+      annotations:
+        dapr.io/enabled: {{ .Values.global.daprEnabled | quote }}
+        dapr.io/app-id: "backend"
+        dapr.io/app-port: {{ .Values.backend.env.PORT | quote }}
+    spec:
+      serviceAccountName: todo-app-sa
+      securityContext:
+        {{- toYaml .Values.security.podSecurityContext | nindent 8 }}
+      containers:
+      - name: backend
+        image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.backend.env.PORT }}
+          name: http
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        env:
+        {{- range $key, $value := .Values.backend.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.security.containerSecurityContext | nindent 10 }}
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.backend.probes.liveness.path }}
+            port: {{ .Values.backend.env.PORT }}
+          initialDelaySeconds: {{ .Values.backend.probes.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.probes.liveness.periodSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.backend.probes.readiness.path }}
+            port: {{ .Values.backend.env.PORT }}
+          initialDelaySeconds: {{ .Values.backend.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.probes.readiness.periodSeconds }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.backend.probes.startup.path }}
+            port: {{ .Values.backend.env.PORT }}
+          initialDelaySeconds: {{ .Values.backend.probes.startup.initialDelaySeconds }}
+          periodSeconds: {{ .Values.backend.probes.startup.periodSeconds }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: backend
+    app.kubernetes.io/name: backend
+spec:
+  type: {{ .Values.backend.service.type }}
+  ports:
+  - port: {{ .Values.backend.service.port }}
+    targetPort: {{ .Values.backend.env.PORT }}
+    protocol: TCP
+    name: http
+  selector:
+    app: backend
+{{- end }}

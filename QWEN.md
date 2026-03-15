@@ -199,12 +199,61 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 ## Basic Project Structure
 
 - `.specify/memory/constitution.md` — Project principles
+- `.specify/memory/phase-iv-v-constitution.md` — Phase IV-V cloud-native principles
 - `specs/<feature>/spec.md` — Feature requirements
 - `specs/<feature>/plan.md` — Architecture decisions
 - `specs/<feature>/tasks.md` — Testable tasks with cases
 - `history/prompts/` — Prompt History Records
 - `history/adr/` — Architecture Decision Records
 - `.specify/` — SpecKit Plus templates and scripts
+- `k8s/` — Kubernetes manifests for Phase IV-V
+- `scripts/phase-iv/` — Phase IV automation scripts
+- `charts/` — Helm charts for deployment
+- `frontend/` — React frontend application
+- `backend/` — Python backend microservices
+
+## Phase IV-V Quick Start
+
+### Prerequisites Check
+```bash
+.specify/scripts/bash/check-prerequisites.sh
+```
+
+### Phase IV: Local Kubernetes (Fast Track)
+```bash
+# 1. Setup Minikube
+scripts/phase-iv/infrastructure/01-setup-minikube.sh
+
+# 2. Enable Addons (ingress, metrics-server)
+scripts/phase-iv/infrastructure/02-enable-addons.sh
+
+# 3. Install Dapr
+scripts/phase-iv/infrastructure/03-install-dapr.sh
+
+# 4. Apply Namespace
+scripts/phase-iv/infrastructure/04-apply-namespace.sh
+
+# 5. Deploy Kafka
+helm install kafka bitnami/kafka -n todo-dev --set replicaCount=1
+
+# 6. Deploy Application
+kubectl apply -f k8s/ -n todo-dev
+```
+
+### Phase V: Cloud Deployment (Azure AKS)
+See: `specs/features/phase-v-tasks.md` for detailed steps
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Architecture Decisions (Phase IV-V)
+
+**Cloud Provider**: Azure AKS (primary), GKE (fallback)
+**Kafka**: Bitnami (local), Confluent Cloud (production)
+**State Backend**: Redis (cache) + PostgreSQL (persistent)
+**Multi-Tenancy**: Single-user now, tenant-ready design
+**Monitoring**: Prometheus + Grafana + Jaeger (local), Grafana Cloud (prod)
+**Logging**: Fluent Bit + Loki
+**CI/CD**: GitHub Actions + GitOps (ArgoCD)
+
+See: `history/adr/001-phase-iv-v-architecture-decisions.md`

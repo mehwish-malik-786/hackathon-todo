@@ -1,0 +1,42 @@
+{{- if .Values.namespace.create }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Values.namespace.name }}
+  labels:
+    app.kubernetes.io/name: todo-app
+    app.kubernetes.io/part-of: phase-iv
+    monitoring: {{ .Values.global.monitoring | quote }}
+    dapr.io/enabled: {{ .Values.global.daprEnabled | quote }}
+{{- end }}
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Values.namespace.name }}-quota
+  namespace: {{ .Values.namespace.name }}
+spec:
+  hard:
+    requests.cpu: {{ .Values.namespace.resourceQuota.requests.cpu | quote }}
+    requests.memory: {{ .Values.namespace.resourceQuota.requests.memory }}
+    limits.cpu: {{ .Values.namespace.resourceQuota.limits.cpu | quote }}
+    limits.memory: {{ .Values.namespace.resourceQuota.limits.memory }}
+    pods: "50"
+    services: "20"
+    secrets: "20"
+    configmaps: "20"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Values.namespace.name }}-limits
+  namespace: {{ .Values.namespace.name }}
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: {{ .Values.namespace.limitRange.default.cpu }}
+      memory: {{ .Values.namespace.limitRange.default.memory }}
+    defaultRequest:
+      cpu: {{ .Values.namespace.limitRange.defaultRequest.cpu }}
+      memory: {{ .Values.namespace.limitRange.defaultRequest.memory }}

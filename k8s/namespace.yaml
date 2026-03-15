@@ -1,0 +1,114 @@
+# =============================================================================
+# Task: PH4-INF-004
+# Spec Reference: specs/features/phase-iv-tasks.md → PH4-INF-004
+# Description: Create Kubernetes Namespace with ResourceQuota and LimitRange
+# Acceptance Criteria:
+#   - Namespace todo-dev created and active
+#   - ResourceQuota configured (CPU: 8 cores, Memory: 8Gi)
+#   - LimitRange configured for default container limits
+#   - Namespace labeled for monitoring
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: todo-dev
+  labels:
+    app.kubernetes.io/name: todo-app
+    app.kubernetes.io/part-of: phase-iv
+    monitoring: enabled
+    dapr.io/enabled: "true"
+---
+# ResourceQuota for todo-dev namespace
+# Limits total resources that can be consumed by all pods in the namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: todo-dev-quota
+  namespace: todo-dev
+spec:
+  hard:
+    # Compute resources
+    requests.cpu: "8"
+    requests.memory: 8Gi
+    limits.cpu: "16"
+    limits.memory: 16Gi
+    
+    # Storage resources
+    requests.storage: 20Gi
+    persistentvolumeclaims: "5"
+    
+    # Object count limits
+    pods: "50"
+    services: "20"
+    secrets: "20"
+    configmaps: "20"
+    replicationcontrollers: "10"
+---
+# LimitRange for default container limits in todo-dev namespace
+# Applied to containers that don't specify their own limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: todo-dev-limits
+  namespace: todo-dev
+spec:
+  limits:
+  # Default limits for containers
+  - type: Container
+    default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    max:
+      cpu: "4"
+      memory: 4Gi
+    min:
+      cpu: 50m
+      memory: 64Mi
+  
+  # Limits for PersistentVolumeClaims
+  - type: PersistentVolumeClaim
+    max:
+      storage: 10Gi
+    min:
+      storage: 1Gi
+---
+# ServiceAccount for Phase IV services
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: todo-app-sa
+  namespace: todo-dev
+  labels:
+    app.kubernetes.io/name: todo-app
+---
+# Role for basic pod and service management
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: todo-app-role
+  namespace: todo-dev
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+# RoleBinding to attach role to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: todo-app-rolebinding
+  namespace: todo-dev
+subjects:
+- kind: ServiceAccount
+  name: todo-app-sa
+  namespace: todo-dev
+roleRef:
+  kind: Role
+  name: todo-app-role
+  apiGroup: rbac.authorization.k8s.io

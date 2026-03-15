@@ -1,0 +1,177 @@
+# Default values for todo-app
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  environment: development
+  daprEnabled: true
+  monitoring: true
+
+# Backend configuration
+backend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: todo-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 7860
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  env:
+    PORT: "7860"
+    DATABASE_URL: "sqlite:///./todo.db"
+    ENVIRONMENT: "development"
+  probes:
+    liveness:
+      path: /health
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readiness:
+      path: /health
+      initialDelaySeconds: 5
+      periodSeconds: 5
+    startup:
+      path: /health
+      initialDelaySeconds: 0
+      periodSeconds: 5
+
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: todo-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  env:
+    PORT: "3000"
+    BACKEND_URL: "http://backend:7860"
+    NODE_ENV: "production"
+  ingress:
+    enabled: true
+    className: nginx
+    host: todo.local
+    annotations:
+      nginx.ingress.kubernetes.io/rewrite-target: /
+
+# Kafka configuration
+kafka:
+  enabled: true
+  replicaCount: 1
+  persistence:
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# Redis configuration (Dapr state store)
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+
+# Dapr configuration
+dapr:
+  enabled: true
+  sidecar:
+    metricsEnabled: true
+    tracingEnabled: true
+    samplingRate: "1"
+  components:
+    pubsub:
+      enabled: true
+      type: kafka
+    statestore:
+      enabled: true
+      type: redis
+    secretstore:
+      enabled: true
+
+# Monitoring configuration
+monitoring:
+  prometheus:
+    enabled: true
+    retention: 15d
+  grafana:
+    enabled: true
+    adminPassword: admin123
+  jaeger:
+    enabled: true
+    storage: memory
+
+# Namespace configuration
+namespace:
+  create: true
+  name: todo-dev
+  resourceQuota:
+    requests:
+      cpu: "8"
+      memory: 8Gi
+    limits:
+      cpu: "16"
+      memory: 16Gi
+  limitRange:
+    default:
+      cpu: 500m
+      memory: 512Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+
+# Security configuration
+security:
+  networkPolicies:
+    enabled: true
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroup: 1000
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+      - ALL

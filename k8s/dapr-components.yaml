@@ -1,0 +1,81 @@
+# =============================================================================
+# Dapr Pub/Sub Component - Redis (Local Dev - Kafka compatible in prod)
+# =============================================================================
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: todo-pubsub
+  namespace: todo-dev
+spec:
+  type: pubsub.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: "redis-master:6379"
+  - name: redisPassword
+    value: ""
+  - name: consumerID
+    value: "todo-consumer"
+---
+# Dapr State Store - Redis (Production-ready)
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: todo-statestore
+  namespace: todo-dev
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: redis-master:6379
+  - name: redisPassword
+    value: ""
+  - name: actorStateStore
+    value: "true"
+  - name: maxRetries
+    value: "3"
+  - name: timeout
+    value: "20s"
+---
+# Dapr Secret Store - Kubernetes Secrets
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: todo-secretstore
+  namespace: todo-dev
+spec:
+  type: secretstores.kubernetes
+  version: v1
+  metadata: []
+---
+# Dapr Cron Binding for Scheduled Tasks (Phase V)
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: scheduled-tasks
+  namespace: todo-dev
+spec:
+  type: bindings.cron
+  version: v1
+  metadata:
+  - name: schedule
+    value: "@every 1m"  # Check for recurring tasks every minute
+---
+# Dapr HTTP Invocation for Service-to-Service calls
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: dapr-config
+  namespace: todo-dev
+spec:
+  tracing:
+    samplingRate: "1"
+  metric:
+    enabled: true
+  accessControl:
+    defaultAction: allow
+  secrets:
+    scopes:
+    - storeName: todo-secretstore
+      defaultAccess: allow
